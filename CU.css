@@ -1,0 +1,462 @@
+* {font-family: 'Chillax', sans-serif;}
+
+/*Login-Signup Page*/
+.login-html, 
+.login-html body.login-page {
+  height: 100%;
+  overflow: hidden;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 95vh;
+  width: 90vw;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.loginimage {
+  height: 90vh;
+  width: 55vw;
+  background-image: url('images/cuttingboard.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 20px;
+  overflow: hidden;
+  margin-top: -70px;
+}
+
+.loginboxes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 400px;
+}
+
+.loginboxes input {
+  display: block;
+  margin: 10px 0;
+  padding: 8px;
+  font-size: 18px;
+  width: 70%;
+  max-width: 70%;
+  border-radius: 25px;
+  box-shadow: 0 2px 2px black;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.loginboxes button {
+  display: block;
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 20px;
+  width: 50%;
+  max-width: 50%;
+  box-shadow: 0 2px 2px black;
+  border: 1px solid black;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.loginboxes button.sign:hover {
+  background-color: turquoise;
+  background-image: none;
+}
+
+.signupoffer {
+  width: 25vw;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+  box-sizing: border-box;
+}
+
+.signupoffer p {
+  font-size: 18px;
+}
+
+.signupoffer .sign {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 2px black;
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.signupoffer button.sign:hover {
+  background-color: turquoise;
+  background-image: none;
+}
+	
+
+/*Home Page*/
+.navbar {background-image: linear-gradient(orange, gold);
+        margin: auto;}
+
+.navbar ul {display: flex;
+            gap: 5%;
+            justify-content: left;
+            align-items: center;}
+
+.navbar li {list-style-type: none;}
+
+.navbar img {width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          margin-top: 5px;}
+
+.navbar img:hover {width: 80px;
+                  height: 80px;}
+
+.text1 {font-size: 50px;
+        color: white;
+        text-shadow: -2px 1px black;}
+        
+.sign {font-size: 15px;
+      color: black;
+      background-color: white;
+      border-radius: 25px;
+      padding: 2px;
+      border: 1px solid black;
+	  box-shadow: 0 2px 2px black;}
+
+.navbar a {text-decoration: none;}
+
+.navbar a:link, .navbar a:visited {color: black;}
+
+.sign:hover {background-image: linear-gradient(to bottom, gold, orange);
+            border: 1px solid white;}
+
+.sign a:hover {color: white;}
+
+.aboutText {margin: 15px 100px;
+            text-align: center;}
+
+.searchC {display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 30px;
+         margin-bottom: 10px;}
+
+.searchT {margin-right: 5px;
+         font-size: 25px;}
+
+.search, .searchB {box-shadow: 0 2px 2px black;
+                  border-radius: 25px;}
+
+.searchB:hover {background-image: linear-gradient(to bottom, gold, orange);
+               color: white;}
+
+.bg1 {background-image: linear-gradient(lightcyan, darkturquoise);
+     height: 380px;}
+
+.gallery {display: flex;
+         justify-content: center;
+         align-content: center;}
+
+.gallery div {align-self: start;
+             margin-right: 13%;
+             margin-top: 1%;
+             font-size: 40px;
+             color: white;
+             text-shadow: -2px 1px black;}
+
+.gallery img {width: 100px;
+             height: 100px;
+             border-radius: 25px;
+             box-shadow: 0 2px 2px black;}
+
+.gallery figcaption {text-align: center;
+                    width: 100px;
+                    overflow-wrap: break-word;
+                    background-color: white;
+                    border-radius: 20px;
+                    box-shadow: 0 2px 2px black;}
+
+.gallery figcaption:hover {background-image: linear-gradient(cyan, darkcyan);
+                          border: 1px solid white;}
+
+.gallery figcaption a:hover {color: white;}
+
+.gallery a {text-decoration: none;
+            padding: 3px;}
+
+.gallery a:link, .gallery a:visited {color: black;}
+
+.text2 {margin: auto;
+        text-align: center;
+        color: white;
+        text-shadow: -1px 1px black;
+        font-size: 25px;}
+
+.categories {margin: auto;}
+
+.categories ul {display: flex;
+                overflow-x: auto;
+                gap: 3%;
+                justify-content: center;
+                align-items: center;}
+
+.categories li {list-style-type: none;
+                background-color: white;
+                border-radius: 25px;
+                padding: 3px;
+                margin-bottom: 10px;
+                font-size: 20px;
+                box-shadow: 0 2px 2px black;}
+
+.categories a {text-decoration: none;}
+
+.categories a:link, .categories a:visited {color: black;}
+
+.categories li:hover {background-image: linear-gradient(cyan, darkcyan);
+                     border: 1px solid white;}
+
+.categories li a:hover {color: white;}
+
+/*Home Page Signed In*/
+.icon1 {margin-left: auto;}
+
+.icon2 {margin-right: 20px;}
+
+/*Southern Page*/
+#southern {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Mexican Page*/
+#mexican {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*African Page*/
+#african {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Italian Page*/
+#italian {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Vietnamese Page*/
+#vietnamese {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Indian Page*/
+#indian {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Mediterranean Page*/
+#mediterranean {background-image: linear-gradient(cyan, darkcyan);
+          border: 1px solid white;}
+
+/*Add Recipe Page*/
+.addBox {margin: auto;}
+
+.addBox img {width: 100px;
+            height: 100px;}
+
+.sec1 {display: flex;
+      flex-direction: column;
+      align-items: center;}
+
+.sec1 label {background-image: linear-gradient(gold, orange);
+            border-radius: 25px;
+            box-shadow: 0 2px 2px black;
+            padding: 2px;
+            margin-bottom: 5px;}
+
+#newImage {margin-bottom:  1%;
+          margin-left: 10%;}
+
+#newName {width: 100px;}
+
+.sec2 {display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1%;
+      margin-top: 3%;}
+
+.sec2 label {background-image: linear-gradient(gold, orange);
+            border-radius: 25px;
+            box-shadow: 0 2px 2px black;
+            padding: 2px;}
+
+.sec3 {display: flex;
+      justify-content: center;
+      margin: 1%;}
+
+.sec3 label {align-self: center;
+            margin-right: 1%;
+            background-image: linear-gradient(gold, orange);
+            border-radius: 25px;
+            box-shadow: 0 2px 2px black;
+            padding: 2px;}
+
+#addSteps {width: 50%;
+          height: 100px;}
+
+#done1 {margin-bottom: 2%;
+       margin-left: 45%;
+       background-image: linear-gradient(cyan, darkcyan);
+       border-radius: 25px;
+       border: none;
+       box-shadow: 0 2px 2px black;}
+
+#done1:hover {color: white;}
+
+/*Saved Recipes Page*/
+.profile {background-image: linear-gradient(gold, orange);
+          margin: auto;
+          padding: 5px;}
+              
+.profile ul {list-style-type: none;
+            display: flex;
+            justify-content: center;}
+
+.profile li {margin-left: 2%;
+            margin-right: 2%;
+            background-color: white;
+            border-radius: 25px;
+            padding: 2px;
+            box-shadow: 0 2px 2px black;}
+
+.profile li:hover {background-image: linear-gradient(gold, orange);
+                  border: 1px solid white;}  
+
+.profile a {text-decoration: none;}
+
+.profile a:link, .profile a:visited {color: black;}
+
+.profile a:hover {color: white;}
+
+.savedTab {background-image: linear-gradient(gold, orange);
+          border: 1px solid white;}
+
+.profileTitle {margin: 5%;
+              display: block;
+              text-align: center;
+              font-size: 30px;
+              color: white;
+              text-shadow: -2px 1px black;}
+
+.gallery2 {width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          margin: auto;}
+
+.gallery2 figure {margin: 1% 3%;}
+
+.gallery2 img {width: 100px;
+              height: 100px;
+              border-radius: 25px;
+              box-shadow: 0 2px 2px black;}
+
+.gallery2 figcaption {text-align: center;
+                     width: 100px;
+                     overflow-wrap: break-word;
+                     border-radius: 25px;
+                     box-shadow: 0 2px 2px black;
+                     padding: 3px;
+                     font-size: 14px;}
+
+.gallery2 figcaption:hover {background-image: linear-gradient(gold, orange);
+                           border: 1px solid white;}
+
+.gallery2 a {text-decoration: none;}
+
+.gallery2 a:link, .gallery2 a:visited {color: black;}
+
+.gallery2 figcaption a:hover {color: white;}
+
+/*Following Page */
+.followingTab {border: 1px solid white;
+              background-image: linear-gradient(gold, orange);}
+
+.followingTab a {color: white;}
+
+.followingBox {width: 30%;
+              margin: auto;
+              margin-top: 10px;
+              padding: 5px;
+              background-image: linear-gradient(cyan, darkcyan);}
+
+.followingBox ul {margin-right: 10%;}
+
+.followingBox li {list-style-type: none;
+                 text-align: center;
+                 margin: 10%;}
+
+.followingBox button {margin-left: 5%;
+                     border-radius: 25px;
+                     background-color: white;
+                     border: none;
+                     box-shadow: 0 2px 2px black;}
+
+.followingBox button:hover {border: 1px solid white;
+                           color: white;
+                           background-image: linear-gradient(cyan, darkcyan);}
+
+
+/*Your Profile Page*/
+
+.profile-page {
+  margin: 10px 6%;
+  font-family: 'Chillax', sans-serif;
+  color: black;
+}
+
+.profile-page .profile-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.profile-page .profile-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5%;
+}
+
+.profile-page .profile-info {
+  text-align: center;
+  min-width: 180px;
+}
+
+.profile-page .profile-info img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  box-shadow: 0 2px 2px black;
+  margin-bottom: 10px;
+}
+
+.profile-page .profile-info p {
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.profile-page .profile-recipes {
+  flex: 1;
+}
+
+.profile-page .profile-section-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 30px 0 10px;
+}
