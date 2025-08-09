@@ -4,7 +4,7 @@ require_once 'db.php';
 
 // Redirect to login if not signed in
 if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: SignIn.php");
     exit();
 }
 
