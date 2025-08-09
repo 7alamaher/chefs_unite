@@ -1,9 +1,15 @@
 <?php
 session_start();
-require_once 'db_connect.php';
+require_once 'db.php';
 
-// Get logged-in username if available
-$currentUsername = $_SESSION['username'] ?? '';
+// Redirect to login if not signed in
+if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
+    header("Location: SignIn.php");
+    exit();
+}
+
+// Get logged-in username
+$currentUsername = $_SESSION['username'];
 ?>
 
 <!DOCTYPE html>
@@ -160,4 +166,5 @@ $currentUsername = $_SESSION['username'] ?? '';
 </div>
 
 </body>
+
 </html>
