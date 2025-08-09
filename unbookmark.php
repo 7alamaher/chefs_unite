@@ -1,9 +1,9 @@
 <?php
 session_start();
-require 'db_connect.php';
+require 'db.php';
 
 if (!isset($_SESSION['user']) || !isset($_POST['recipe_id'])) {
-    header("Location: home.php");
+    header("Location: Home.php");
     exit;
 }
 
@@ -27,3 +27,4 @@ $stmt->close();
 header("Location: recipe.php?id=" . $recipeId);
 exit;
 ?>
+
