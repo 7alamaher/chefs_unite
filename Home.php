@@ -2,8 +2,14 @@
 session_start();
 require_once 'db.php';
 
-// Get logged-in username if available
-$currentUsername = $_SESSION['username'] ?? '';
+// Redirect to login if not signed in
+if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get logged-in username
+$currentUsername = $_SESSION['username'];
 ?>
 
 <!DOCTYPE html>
