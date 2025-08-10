@@ -3,12 +3,12 @@ require 'db.php'; // your database connection
 session_start();
 
 // Check if user is logged in
-if (!isset($_SESSION['username']['user_id'])) {
+if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
     header("Location: SignIn.php");
     exit();
 }
 
-$user_id = $_SESSION['username']['user_id'];
+$user_id = $_SESSION['user_id'];
 
 // Fetch user profile details
 $sql = "SELECT username, created_at, country FROM users WHERE user_id = ?";
@@ -63,4 +63,3 @@ $user = $result->fetch_assoc();
     </div>
 </body>
 </html>
-
