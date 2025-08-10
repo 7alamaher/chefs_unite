@@ -74,7 +74,7 @@ $result = $stmt->get_result();
             <span><?php echo htmlspecialchars($row['title']); ?></span>
         </div>
         <div class="recipe-actions">
-            <a href="editRecipe.php"><i class="fa fa-edit" title="Edit"></i></a>
+            <a href="editRecipe.php?recipe_id=<?php echo $row['id']; ?>"><i class="fa fa-edit" title="Edit"></i></a>
             <i class="fa fa-trash" style="color:red;" 
                onclick="confirmDelete(<?php echo $row['id']; ?>, '<?php echo addslashes($row['title']); ?>')"></i>
         </div>
