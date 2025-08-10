@@ -8,6 +8,7 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
     exit();
 }
 
+$user = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
 
 // Fetch user profile details
@@ -18,6 +19,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,9 +47,10 @@ $user = $result->fetch_assoc();
         </p>
         <nav>
             <ul>
-                <li><a href="Followers.php">Followers: 0</a></li>
-                <li><a href="Following.php">Following: 0</a></li>
-                <li> <a href="YourRecipes.php">Your Recipes</a></li>
+                <li><a href="Followers.php">Followers Count</a></li>
+                <li><a href="Following.php">Following Count</a></li>
+                <li><a href="UploadRecipe.php">Upload Recipe</a></li>
+                <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
                 <li><a href="SavedRecipes.php">Saved Recipes</a></li>
             </ul>
         </nav>
