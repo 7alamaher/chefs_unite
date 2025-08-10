@@ -1,17 +1,23 @@
 <?php
-require 'session_guard.php';
+session_start();
 require 'db.php';
 
-// Get logged-in user ID
-$user_id = $_SESSION['username']['user_id'];
+// Redirect if user not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: SignIn.php");
+    exit();
+}
 
-// Fetch all recipes uploaded by this user
-$sql = "SELECT id, title, image FROM recipes WHERE user_id = ?";
+$user_id = $_SESSION['user_id'];
+
+// Fetch recipes using the correct column name for the image
+$sql = "SELECT id, title, image_url FROM recipes WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -62,15 +68,15 @@ $result = $stmt->get_result();
 <h1>Your Recipes</h1>
 
 <?php while ($row = $result->fetch_assoc()): ?>
-    <div class="recipe-card" id="recipe-<?php echo $row['recipe_id']; ?>">
+    <div class="recipe-card" <?php echo $row['id']; ?>>
         <div class="recipe-info">
-            <img src="<?php echo $row['image']; ?>" alt="Recipe Image" width="60" height="60">
+            <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="Recipe Image" width="60" height="60">
             <span><?php echo htmlspecialchars($row['title']); ?></span>
         </div>
         <div class="recipe-actions">
-            <i class="fa fa-edit" title="Edit"></i>
+            <a href="editRecipe.php"><i class="fa fa-edit" title="Edit"></i></a>
             <i class="fa fa-trash" style="color:red;" 
-               onclick="confirmDelete(<?php echo $row['recipe_id']; ?>, '<?php echo addslashes($row['title']); ?>')"></i>
+               onclick="confirmDelete(<?php echo $row['id']; ?>, '<?php echo addslashes($row['title']); ?>')"></i>
         </div>
     </div>
 <?php endwhile; ?>
@@ -103,21 +109,27 @@ function closeConfirm() {
 }
 
 function deleteRecipeConfirmed() {
+    if (!recipeToDelete) return;
+
     fetch('deleteRecipe.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'recipe_id=' + recipeToDelete
+        body: 'recipe_id=' + encodeURIComponent(recipeToDelete)
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('recipe-' + recipeToDelete).remove();
+            const recipeCard = document.getElementById('recipe-' + recipeToDelete);
+            if (recipeCard) {
+                recipeCard.remove(); // Remove recipe card instantly
+            }
         } else {
-            alert(data.message);
+            alert(data.message || "Error deleting recipe.");
         }
         closeConfirm();
     })
     .catch(err => {
+        console.error(err);
         alert("Error deleting recipe.");
         closeConfirm();
     });
