@@ -1,7 +1,11 @@
 <?php
-// edit_recipe.php
-require 'session_guard.php'; // Ensure user is logged in
+session_start();
 require 'db.php';
+
+// Check login
+if (!isset($_SESSION['user_id'])) {
+    die("You must be logged in to edit recipes.");
+}
 
 // Get recipe ID from query string
 if (!isset($_GET['recipe_id']) || !is_numeric($_GET['recipe_id'])) {
@@ -9,10 +13,10 @@ if (!isset($_GET['recipe_id']) || !is_numeric($_GET['recipe_id'])) {
 }
 
 $recipe_id = intval($_GET['recipe_id']);
-$user_id = $_SESSION['username']['recipe_id']; // Assuming session stores user ID
+$user_id = intval($_SESSION['user_id']);
 
 // Fetch recipe data for this user
-$sql = "SELECT * FROM recipes WHERE recipe_id = ? AND user_id = ?";
+$sql = "SELECT * FROM recipes WHERE id = ? AND user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $recipe_id, $user_id);
 $stmt->execute();
@@ -27,31 +31,33 @@ $stmt->close();
 
 // Fetch ingredients
 $ingredients = [];
-$sql = "SELECT ingredient FROM recipe_ingredients WHERE recipe_id = ?";
+$sql = "SELECT name FROM recipe_ingredients WHERE recipe_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $recipe_id);
 $stmt->execute();
 $ing_result = $stmt->get_result();
 while ($row = $ing_result->fetch_assoc()) {
-    $ingredients[] = $row['ingredient'];
+    $ingredients[] = $row['name'];
 }
 $stmt->close();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
-    $description = trim($_POST['description']);
-    $instructions = trim($_POST['instructions']);
     $cuisine = trim($_POST['cuisine']);
+    $recipe_type = trim($_POST['recipe_type'] ?? '');
+    $recipe_difficulty = trim($_POST['recipe_difficulty'] ?? '');
+    $serves = trim($_POST['serves'] ?? '');
+    $time_to_make = trim($_POST['time_to_make'] ?? '');
     $new_ingredients = array_map('trim', $_POST['ingredients'] ?? []);
 
     // Start transaction
     $conn->begin_transaction();
     try {
         // Update recipe
-        $sql = "UPDATE recipes SET title = ?, description = ?, instructions = ?, cuisine = ? WHERE recipe_id = ? AND user_id = ?";
+        $sql = "UPDATE recipes SET title = ?, cuisine = ?, recipe_type = ?, recipe_difficulty = ?, serves = ?, Time_to_make = ? WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssii", $title, $description, $instructions, $cuisine, $recipe_id, $user_id);
+        $stmt->bind_param("ssssssii", $title, $cuisine, $recipe_type, $recipe_difficulty, $serves, $time_to_make, $recipe_id, $user_id);
         $stmt->execute();
         $stmt->close();
 
@@ -63,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert new ingredients
         if (!empty($new_ingredients)) {
-            $stmt = $conn->prepare("INSERT INTO recipe_ingredients (recipe_id, ingredient) VALUES (?, ?)");
+            $stmt = $conn->prepare("INSERT INTO recipe_ingredients (recipe_id, name) VALUES (?, ?)");
             foreach ($new_ingredients as $ingredient) {
                 if (!empty($ingredient)) {
                     $stmt->bind_param("is", $recipe_id, $ingredient);
@@ -74,7 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
-        echo "<p style='color: green;'>Recipe updated successfully!</p>";
+
+        // Redirect after successful update
+        header("Location: YourRecipes.php");
+        exit();
+
     } catch (Exception $e) {
         $conn->rollback();
         echo "<p style='color: red;'>Error updating recipe: " . htmlspecialchars($e->getMessage()) . "</p>";
@@ -102,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const div = document.createElement('div');
             div.classList.add('ingredient-group');
             div.innerHTML = `
-                <input type="text" name="ingredients[]" value="${value}" placeholder="Ingredient" required>
+                <input type="text" name="ingredients[]" value="${value.replace(/"/g, '&quot;')}" placeholder="Ingredient" required>
                 <button type="button" onclick="removeIngredientField(this)">Remove</button>
             `;
             container.appendChild(div);
@@ -124,14 +134,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>Title:
             <input type="text" name="title" value="<?= htmlspecialchars($recipe['title']) ?>" required>
         </label>
-        <label>Description:
-            <textarea name="description" required><?= htmlspecialchars($recipe['description']) ?></textarea>
-        </label>
-        <label>Instructions:
-            <textarea name="instructions" required><?= htmlspecialchars($recipe['instructions']) ?></textarea>
-        </label>
         <label>Cuisine:
-            <input type="text" name="cuisine" value="<?= htmlspecialchars($recipe['cuisine']) ?>" required>
+            <input type="text" name="cuisine" value="<?= htmlspecialchars($recipe['cuisine']) ?>">
+        </label>
+        <label>Recipe Type:
+            <input type="text" name="recipe_type" value="<?= htmlspecialchars($recipe['recipe_type']) ?>">
+        </label>
+        <label>Recipe Difficulty:
+            <input type="text" name="recipe_difficulty" value="<?= htmlspecialchars($recipe['recipe_difficulty']) ?>">
+        </label>
+        <label>Serves:
+            <input type="text" name="serves" value="<?= htmlspecialchars($recipe['serves']) ?>">
+        </label>
+        <label>Time to Make:
+            <input type="text" name="time_to_make" value="<?= htmlspecialchars($recipe['Time_to_make']) ?>">
         </label>
         <label>Ingredients:</label>
         <div id="ingredients-container"></div>
