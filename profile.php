@@ -32,8 +32,8 @@ $user = $result->fetch_assoc();
         <ul>
             <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
             <li class="text1">Chefs Unite</li>
-            <li class="icon1"><a href="YourRecipes.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
-            <li class="icon2"><a href="HomeProfile.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
+            <li class="icon1"><a href="profile.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
+            <li class="icon2"><a href="Home.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
         </ul>
     </nav>
 
@@ -47,7 +47,7 @@ $user = $result->fetch_assoc();
             <ul>
                 <li><a href="Followers.php">Followers: 0</a></li>
                 <li><a href="Following.php">Following: 0</a></li>
-                <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
+                <li> <a href="YourRecipes.php">Your Recipes</a></li>
                 <li><a href="SavedRecipes.php">Saved Recipes</a></li>
             </ul>
         </nav>
