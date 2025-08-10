@@ -1,7 +1,7 @@
 
 <?php
 $host = 'localhost';
-$dbname = 'chief_unite';
+$dbname = 'chef_unite';
 $username = 'root';
 $password = '';
 

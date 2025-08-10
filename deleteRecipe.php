@@ -2,13 +2,13 @@
 require 'session_guard.php'; // Protect backend
 require 'db.php';
 
-if (!isset($_GET['id'])) {
+if (!isset($_POST['id'])) {
     echo json_encode(["success" => false, "message" => "Recipe ID missing"]);
     exit;
 }
 
-$recipe_id = intval($_GET['id']);
-$user_id = $_SESSION['user']['id']; // Logged-in user
+$recipe_id = intval($_POST['user_id']);
+$user_id = $_SESSION['username'];// Logged-in user
 
 // Check ownership
 $sql = "SELECT id FROM recipes WHERE id = ? AND user_id = ?";

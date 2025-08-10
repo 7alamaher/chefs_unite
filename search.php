@@ -4,7 +4,7 @@
 	if (isset($_GET['q']) && !empty(trim($_GET['q']))) {
 		$searchTerm = "%" . $conn->real_escape_string($_GET['q']) . "%";
 
-		$stmt = $conn->prepare("SELECT title, description, image_url FROM recipes WHERE title LIKE ? OR ingredients LIKE ?");
+		$stmt = $conn->prepare("SELECT title, description, image_url FROM recipes WHERE title LIKE ? OR ingredients LIKE ? OR cusine LIKE ?");
 		$stmt->bind_param("ss", $searchTerm, $searchTerm);
 		$stmt->execute();
 		$result = $stmt->get_result();
