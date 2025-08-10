@@ -2,28 +2,22 @@
 session_start();
 require 'db.php';
 
-if (!isset($_SESSION['user']) || !isset($_POST['recipe_id'], $_POST['action'])) {
-    header("Location: login.php");
-    exit;
+$currentUsername = $_SESSION['username'] ?? null;
+if (!$currentUsername) {
+    header("Location: SignIn.php");
+    exit();
 }
 
-$currentUsername = $_SESSION['user'];
 $recipeId = intval($_POST['recipe_id']);
 $action = $_POST['action'];
 
 // Get current user ID
-$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+$stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
 $stmt->bind_param("s", $currentUsername);
 $stmt->execute();
 $stmt->bind_result($userId);
 $stmt->fetch();
 $stmt->close();
-
-if (!$userId) {
-    // Could not find user
-    header("Location: login.php");
-    exit;
-}
 
 // Perform like action
 if ($action === 'like') {
@@ -40,4 +34,3 @@ if ($action === 'like') {
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 exit;
-
