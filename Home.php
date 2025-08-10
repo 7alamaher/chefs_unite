@@ -2,8 +2,14 @@
 session_start();
 require_once 'db.php';
 
-// Get logged-in username if available
-$currentUsername = $_SESSION['username'] ?? '';
+// Redirect to login if not signed in
+if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
+    header("Location: SignIn.php");
+    exit();
+}
+
+// Get logged-in username
+$currentUsername = $_SESSION['username'];
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +29,7 @@ $currentUsername = $_SESSION['username'] ?? '';
             <li class="text1">Chefs Unite</li>
             <li class="sign">
                 <?php if (isset($_SESSION['username'])): ?>
-                    <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?> | <a href="Logout.php">Logout</a></span>
+                     <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?> | <a href="Logout.php">Logout</a> | <a "href="profile.php">Profile</a></span>
                 <?php else: ?>
                     <a href="SignIn.php">Sign up or Log in!</a>
                 <?php endif; ?>
