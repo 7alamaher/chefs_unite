@@ -3,7 +3,7 @@ require 'db.php'; // your database connection
 session_start();
 
 // Check if user is logged in
-if (!isset($_SESSION['username']['user_id'])) {
+if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
     header("Location: SignIn.php");
     exit();
 }
@@ -63,4 +63,3 @@ $user = $result->fetch_assoc();
     </div>
 </body>
 </html>
-

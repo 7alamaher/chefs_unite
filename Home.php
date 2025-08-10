@@ -29,7 +29,7 @@ $currentUsername = $_SESSION['username'];
             <li class="text1">Chefs Unite</li>
             <li class="sign">
                 <?php if (isset($_SESSION['username'])): ?>
-                    <span>Welcome, <?= htmlspecialchars($currentUsername) ?> | <a href="SignIn.php"> logout</a> | <a href="profile.php">profile</a></span>
+                    <span>Welcome, <?= htmlspecialchars($currentUsername) ?> | <a href="Logout.php"> logout</a> | <a href="profile.php">profile</a></span>
                 <?php else: ?>
                     <a href="SignIn.php">Sign up or Log in!</a>
                 <?php endif; ?>

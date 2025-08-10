@@ -1,12 +1,11 @@
 <?php
 session_start();
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
 
 // Destroy the session
-$_SESSION = [];            // Clear session variables
-session_destroy();         // Destroy the session
+$_SESSION = [];
+session_destroy();
 
-echo json_encode([
-    "message" => "Logout successful."
-]);
+// Redirect to SignIn.php
+header("Location: SignIn.php");
+exit;
+?>

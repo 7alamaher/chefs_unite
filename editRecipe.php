@@ -4,15 +4,15 @@ require 'session_guard.php'; // Ensure user is logged in
 require 'db.php';
 
 // Get recipe ID from query string
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+if (!isset($_GET['recipe_id']) || !is_numeric($_GET['recipe_id'])) {
     die("Invalid recipe ID.");
 }
 
-$recipe_id = intval($_GET['id']);
-$user_id = $_SESSION['user']['id']; // Assuming session stores user ID
+$recipe_id = intval($_GET['recipe_id']);
+$user_id = $_SESSION['username']['recipe_id']; // Assuming session stores user ID
 
 // Fetch recipe data for this user
-$sql = "SELECT * FROM recipes WHERE id = ? AND user_id = ?";
+$sql = "SELECT * FROM recipes WHERE recipe_id = ? AND user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $recipe_id, $user_id);
 $stmt->execute();
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->begin_transaction();
     try {
         // Update recipe
-        $sql = "UPDATE recipes SET title = ?, description = ?, instructions = ?, cuisine = ? WHERE id = ? AND user_id = ?";
+        $sql = "UPDATE recipes SET title = ?, description = ?, instructions = ?, cuisine = ? WHERE recipe_id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssssii", $title, $description, $instructions, $cuisine, $recipe_id, $user_id);
         $stmt->execute();
