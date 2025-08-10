@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php'; 
+require_once 'db.php';
 
 // Redirect if user not logged in
 if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
@@ -20,62 +20,92 @@ $user_id = $user['user_id'] ?? null;
 $successMsg = $errorMsg = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
+    // Sanitize inputs
     $title       = trim($_POST['newName']);
-    $mealType    = $_POST['mealType'];
-    $cuisine     = $_POST['cuiType'];
-    $difficulty  = $_POST['recipeDiff'];
-    $serves      = $_POST['serves'];
-    $timeR       = $_POST['timeR'];
+    $mealType    = trim($_POST['mealType']);
+    $cuisine     = trim($_POST['cuiType']);
+    $difficulty  = trim($_POST['recipeDiff']);
+    $serves      = trim($_POST['serves']);
+    $timeR       = trim($_POST['timeR']);
     $steps       = trim($_POST['addSteps']);
 
     // Handle image upload
-    $image_url = "";
+    $image_url = null;
     if (isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
-        $fileTmp  = $_FILES['newImage']['tmp_name'];
-        $fileName = uniqid("recipe_", true) . "." . pathinfo($_FILES['newImage']['name'], PATHINFO_EXTENSION);
-        $filePath = "uploads/" . $fileName;
-        if (!is_dir("uploads")) mkdir("uploads", 0777, true);
-        if (move_uploaded_file($fileTmp, $filePath)) {
-            $image_url = $filePath;
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $fileType = mime_content_type($_FILES['newImage']['tmp_name']);
+        $fileSize = $_FILES['newImage']['size'];
+
+        if (!in_array($fileType, $allowedTypes)) {
+            $errorMsg = "Only JPG, PNG, and GIF files are allowed.";
+        } elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
+            $errorMsg = "Image size must be under 5MB.";
         } else {
-            $errorMsg = "Error uploading image.";
+            $fileTmp  = $_FILES['newImage']['tmp_name'];
+            $fileName = uniqid("recipe_", true) . "." . pathinfo($_FILES['newImage']['name'], PATHINFO_EXTENSION);
+            $filePath = "uploads/" . $fileName;
+
+            if (!is_dir("uploads")) mkdir("uploads", 0777, true);
+            if (move_uploaded_file($fileTmp, $filePath)) {
+                $image_url = $filePath;
+            } else {
+                $errorMsg = "Error uploading image.";
+            }
         }
     }
 
     if (empty($errorMsg)) {
-        // Insert recipe
+        // Insert into recipes table matching schema exactly
         $stmt = $conn->prepare("
-            INSERT INTO recipes (user_id, title, description, steps, cuisine, image_url, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, NOW())
+            INSERT INTO recipes 
+                (user_id, title, steps, cuisine, image_url, recipe_type, recipe_difficulty, serves, Time_to_make) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $description = "Meal: $mealType | Difficulty: $difficulty | Serves: $serves | Time: $timeR";
-        $stmt->bind_param("isssss", $user_id, $title, $description, $steps, $cuisine, $image_url);
+        $stmt->bind_param(
+            "issssssss", 
+            $user_id, 
+            $title, 
+            $steps, 
+            $cuisine, 
+            $image_url, 
+            $mealType, 
+            $difficulty, 
+            $serves, 
+            $timeR
+        );
+
         if ($stmt->execute()) {
             $recipe_id = $stmt->insert_id;
 
-            // Insert ingredients
-            if (!empty($_POST['ingredient_name'])) {
+            // Insert ingredients if provided
+            if (!empty($_POST['ingredient']) && is_array($_POST['ingredient'])) {
                 $ingredientStmt = $conn->prepare("
-                    INSERT INTO recipe_ingredients (recipe_id, ingredient_name, quantity, unit)
+                    INSERT INTO recipe_ingredients (recipe_id, name, quantity, unit) 
                     VALUES (?, ?, ?, ?)
                 ");
-                foreach ($_POST['ingredient_name'] as $index => $name) {
+
+                foreach ($_POST['ingredient'] as $index => $name) {
                     $name = trim($name);
-                    $qty  = trim($_POST['ingredient_qty'][$index] ?? '');
-                    $unit = trim($_POST['ingredient_unit'][$index] ?? '');
+                    $quantity = isset($_POST['quantity'][$index]) ? floatval($_POST['quantity'][$index]) : null;
+                    $unit = isset($_POST['unit'][$index]) ? trim($_POST['unit'][$index]) : null;
+
                     if (!empty($name)) {
-                        $ingredientStmt->bind_param("isss", $recipe_id, $name, $qty, $unit);
+                        $ingredientStmt->bind_param("isds", $recipe_id, $name, $quantity, $unit);
                         $ingredientStmt->execute();
                     }
                 }
+                $ingredientStmt->close();
             }
 
             $successMsg = "Recipe added successfully!";
         } else {
-            $errorMsg = "Error adding recipe: " . $conn->error;
+            $errorMsg = "Error adding recipe: " . $stmt->error;
         }
+        $stmt->close();
     }
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
