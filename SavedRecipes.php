@@ -7,10 +7,10 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-$userId = $_SESSION['user_id'];
+$userId = intval($_SESSION['user_id']);
 
 $sql = "
-    SELECT r.id, r.title, r.description, r.image_url, r.cuisine, r.created_at, u.username
+    SELECT r.id, r.title, r.image_url, r.cuisine, r.created_at, u.username
     FROM bookmarks b
     INNER JOIN recipes r ON b.recipe_id = r.id
     INNER JOIN users u ON r.user_id = u.user_id
@@ -27,24 +27,39 @@ $result = $stmt->get_result();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Chefs Unite - Saved Recipes</title>
     <link rel="stylesheet" href="CU.css">
+    <link href="https://api.fontshare.com/v2/css?f[]=chillax@400&display=swap" rel="stylesheet">
 </head>
 <body>
+    
     <h1>My Saved Recipes</h1>
+    <nav class="navbar">
+        <ul>
+            <li><a href="Followers.php">Followers Count</a></li>
+            <li><a href="Following.php">Following Count</a></li>
+            <li><a href="UploadRecipe.php">Upload Recipe</a></li>
+            <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
+            <li><a href="SavedRecipes.php">Saved Recipes</a></li>
+        </ul>
+    </nav>
 
     <?php if ($result->num_rows > 0): ?>
         <div class="recipe-grid">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="recipe-card">
-                    <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
+                    <img
+                        src="<?php echo htmlspecialchars($row['image_url'] ?: 'default-placeholder.png'); ?>"
+                        alt="<?php echo htmlspecialchars($row['title']); ?>"
+                        width="200"
+                        height="150"
+                    />
                     <h2><?php echo htmlspecialchars($row['title']); ?></h2>
                     <p><strong>By:</strong> <?php echo htmlspecialchars($row['username']); ?></p>
                     <p><strong>Cuisine:</strong> <?php echo htmlspecialchars($row['cuisine']); ?></p>
-                    <p><?php echo htmlspecialchars($row['description']); ?></p>
-                    <a href="view_recipe.php?id=<?php echo $row['id']; ?>">View Recipe</a>
+                    <a href="viewRecipe.php?id=<?php echo $row['id']; ?>">View Recipe</a>
                 </div>
             <?php endwhile; ?>
         </div>
@@ -58,4 +73,4 @@ $result = $stmt->get_result();
 <?php
 $stmt->close();
 $conn->close();
-?>
+
