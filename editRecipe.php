@@ -96,7 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Edit Recipe</title>
+    <title>Chefs Unite - Edit Recipe</title>
+    <link rel="stylesheet" href="CU.css">
+    <link href="https://api.fontshare.com/v2/css?f[]=chillax@400&display=swap" rel="stylesheet">
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; }
         label { display: block; margin-top: 10px; }
