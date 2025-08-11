@@ -1,36 +1,49 @@
 <?php
 session_start();
-require 'db.php';
+require_once 'db.php';
 
-$currentUsername = $_SESSION['username'] ?? null;
-if (!$currentUsername) {
-    header("Location: SignIn.php");
-    exit();
+// Must be logged in to like
+if (!isset($_SESSION['username'])) {
+    die("You must be logged in to like a recipe.");
 }
 
-$recipeId = intval($_POST['recipe_id']);
-$action = $_POST['action'];
+// Get recipe_id from POST
+$recipeId = $_POST['recipe_id'] ?? null;
+$action   = $_POST['action'] ?? null;
 
-// Get current user ID
+if (!$recipeId) {
+    die("Recipe ID missing.");
+}
+
+// Get current user's ID
+$username = $_SESSION['username'];
 $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-$stmt->bind_param("s", $currentUsername);
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->bind_result($userId);
 $stmt->fetch();
 $stmt->close();
 
-// Perform like action
+if (!$userId) {
+    die("User not found.");
+}
+
 if ($action === 'like') {
-    $stmt = $conn->prepare("INSERT IGNORE INTO likes (user_id, recipe_id) VALUES (?, ?)");
-    $stmt->bind_param("ii", $userId, $recipeId);
+    // Add like
+    $stmt = $conn->prepare("INSERT IGNORE INTO likes (recipe_id, user_id) VALUES (?, ?)");
+    $stmt->bind_param("ii", $recipeId, $userId);
     $stmt->execute();
     $stmt->close();
 } elseif ($action === 'unlike') {
-    $stmt = $conn->prepare("DELETE FROM likes WHERE user_id = ? AND recipe_id = ?");
-    $stmt->bind_param("ii", $userId, $recipeId);
+    // Remove like
+    $stmt = $conn->prepare("DELETE FROM likes WHERE recipe_id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $recipeId, $userId);
     $stmt->execute();
     $stmt->close();
+} else {
+    die("Invalid action.");
 }
 
+// Redirect back to the referring page
 header("Location: " . $_SERVER['HTTP_REFERER']);
-exit;
+exit();
