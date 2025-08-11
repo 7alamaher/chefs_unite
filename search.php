@@ -1,30 +1,45 @@
 <?php
-	include 'db.php';
+include 'db.php';
 
-	if (isset($_GET['q']) && !empty(trim($_GET['q']))) {
-		$searchTerm = "%" . $conn->real_escape_string($_GET['q']) . "%";
+if (isset($_GET['q']) && !empty(trim($_GET['q']))) {
+    $searchTerm = "%" . trim($_GET['q']) . "%";
 
-		$stmt = $conn->prepare("SELECT title, description, image_url FROM recipes WHERE title LIKE ? OR ingredients LIKE ? OR cusine LIKE ?");
-		$stmt->bind_param("ss", $searchTerm, $searchTerm);
-		$stmt->execute();
-		$result = $stmt->get_result();
+    // Prepare SQL with LEFT JOIN to recipe_ingredients for ingredient name search
+    $sql = "
+        SELECT DISTINCT r.id, r.title, r.steps, r.image_url
+        FROM recipes r
+        LEFT JOIN recipe_ingredients ri ON r.id = ri.recipe_id
+        WHERE r.title LIKE ? OR r.cuisine LIKE ? OR ri.name LIKE ?
+        ORDER BY r.title ASC
+        LIMIT 50
+    ";
 
-		echo "<h2>Search Results for \"" . htmlspecialchars($_GET['q']) . "\":</h2>";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
 
-		if ($result->num_rows > 0) {
-			while ($recipe = $result->fetch_assoc()) {
-				echo "<div class='recipe'>";
-				echo "<h3>" . htmlspecialchars($recipe['title']) . "</h3>";
-				echo "<p>" . htmlspecialchars($recipe['description']) . "</p>";
-				if ($recipe['image_url']) {
-					echo "<img src='" . htmlspecialchars($recipe['image_url']) . "' alt='Recipe Image' width='200'>";
-				}
-				echo "</div><hr>";
-			}
-		} else {
-			echo "<p>No recipes found.</p>";
-		}
-	} else {
-		echo "<p>Please enter a search term.</p>";
-	}
+    $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    echo "<h2>Search Results for \"" . htmlspecialchars($_GET['q']) . "\":</h2>";
+
+    if ($result->num_rows > 0) {
+        while ($recipe = $result->fetch_assoc()) {
+            echo "<div class='recipe'>";
+            echo "<h3>" . htmlspecialchars($recipe['title']) . "</h3>";
+            // Description is not in your schema. If you want to show steps snippet or something, you can do that:
+            echo "<p>" . htmlspecialchars(substr($recipe['steps'], 0, 150)) . "...</p>";
+            if ($recipe['image_url']) {
+                echo "<img src='" . htmlspecialchars($recipe['image_url']) . "' alt='Recipe Image' width='200'>";
+            }
+            echo "</div><hr>";
+        }
+    } else {
+        echo "<p>No recipes found.</p>";
+    }
+} else {
+    echo "<p>Please enter a search term.</p>";
+}
 ?>
