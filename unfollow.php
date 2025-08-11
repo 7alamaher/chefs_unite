@@ -2,35 +2,31 @@
 session_start();
 require 'db.php';
 
-if (!isset($_SESSION['user']) || !isset($_POST['followed_id'])) {
-    header("Location: home.php");
-    exit;
+if (!isset($_SESSION['username'])) {
+    header("Location: SignIn.php");
+    exit();
 }
 
-$currentUsername = $_SESSION['user'];
-$followingId = intval($_POST['followed_id']); // user to be unfollowed
+if (!isset($_GET['user_id'])) {
+    die("User ID missing.");
+}
 
-// Get current user's user_id
+$followed_id = intval($_GET['user_id']);
+
+// Get current user ID
 $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-$stmt->bind_param("s", $currentUsername);
+$stmt->bind_param("s", $_SESSION['username']);
 $stmt->execute();
-$stmt->bind_result($followerId);
+$stmt->bind_result($follower_id);
 $stmt->fetch();
 $stmt->close();
 
-if (!$followerId || $followerId == $followingId) {
-    // Invalid or self-unfollow attempt
-    header("Location: home.php");
-    exit;
-}
+// Unfollow
+$del = $conn->prepare("DELETE FROM follows WHERE follower_id = ? AND following_id = ?");
+$del->bind_param("ii", $follower_id, $followed_id);
+$del->execute();
+$del->close();
 
-// Delete the follow relationship
-$stmt = $conn->prepare("DELETE FROM follows WHERE follower_id = ? AND following_id = ?");
-$stmt->bind_param("ii", $followerId, $followingId);
-$stmt->execute();
-$stmt->close();
-
-header("Location: home.php");
-exit;
+header("Location: viewProfile.php?id=" . $followed_id);
+exit();
 ?>
-
