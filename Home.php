@@ -88,47 +88,36 @@ $currentUsername = $_SESSION['username'];
 			</nav>
 		</div>
 
-    <div class="gallery2">
-        <figure>
-            <img src="Images/birria-tacos-recipe-5189284-hero-01-56190b7eb77b4370a0bf7f2341e94ee4.jpg" alt="Birria Tacos">
-            <figcaption><a href="#">Birria Tacos by ketchup_in_the_kitchen</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/breakfast-burrito-lead-66a7e23ce81b0.jpg" alt="Breakfast Burrito">
-            <figcaption><a href="#">CheEZy's Breakfast Burrito by cheEZy</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/chicken and brocccoli.jpg" alt="Chicken and Broccoli">
-            <figcaption><a href="#">Chicken and Broccoli by QuickMeals</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/COPYCAT-IKEA-SWEDISH-MEATBALLS-FINALS-2-1-1.jpg" alt="Swedish Meatballs">
-            <figcaption><a href="#">Ikea's Swedish Meatballs by copyKat95</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/French-Toast-Sticks-Camping-Breakfast-1400px-5.jpg" alt="French Toast Sticks">
-            <figcaption><a href="#">French Toast Sticks by for_champs</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/Mac-and-cheese-photo.jpg" alt="Mac n Cheese">
-            <figcaption><a href="#">cheEZy's Mac by cheEZy</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/pho.jpg" alt="Beef Pho">
-            <figcaption><a href="#">Beef Pho by TheNguyeners</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/Spaghetti-Alfredo-FEAT-IMAGE.jpg" alt="Simple Alfredo">
-            <figcaption><a href="#">Simple Alfredo by impasta</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/Spaghetti-Bolognese-Chicken.jpg" alt="Spaghetti">
-            <figcaption><a href="#">Spaghetti by impasta</a></figcaption>
-        </figure>
-        <figure>
-            <img src="Images/vegan-poke-bowl-recipe.jpg" alt="Poke Bowl">
-            <figcaption><a href="#">Poke Bowl by BrandoTazen</a></figcaption>
-        </figure>
-    </div>
+       <div class="gallery2">
+    <?php
+    require 'db.php';
+
+    $sql = "SELECT r.id, r.title, r.image_url, u.username
+            FROM recipes r
+            JOIN users u ON r.user_id = u.user_id
+            ORDER BY r.created_at DESC";
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $title = htmlspecialchars($row['title']);
+            $image = htmlspecialchars($row['image_url']); 
+            $author = htmlspecialchars($row['username']);
+
+            echo "
+            <figure>
+                <img src='$image' alt='$title'>
+                <figcaption>
+                    <a href='viewRecipe.php?id={$row['id']}'>$title by $author</a>
+                </figcaption>
+            </figure>";
+        }
+    } else {
+        echo "<p>No recipes found.</p>";
+    }
+    ?>
+</div>
+
+
 </body>
 </html>
