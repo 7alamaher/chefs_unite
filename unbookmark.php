@@ -1,30 +1,37 @@
 <?php
 session_start();
-require 'db.php';
+require_once 'db.php';
 
-if (!isset($_SESSION['user']) || !isset($_POST['recipe_id'])) {
-    header("Location: Home.php");
-    exit;
+// Must be logged in
+if (!isset($_SESSION['username'])) {
+    die("You must be logged in to remove a bookmark.");
 }
 
-$currentUsername = $_SESSION['user'];
-$recipeId = intval($_POST['recipe_id']);
+$recipeId = $_POST['recipe_id'] ?? null;
+
+if (!$recipeId) {
+    die("Recipe ID missing.");
+}
 
 // Get current user's ID
+$username = $_SESSION['username'];
 $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-$stmt->bind_param("s", $currentUsername);
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->bind_result($userId);
 $stmt->fetch();
 $stmt->close();
 
-// Delete the bookmark
-$stmt = $conn->prepare("DELETE FROM bookmarks WHERE user_id = ? AND recipe_id = ?");
-$stmt->bind_param("ii", $userId, $recipeId);
+if (!$userId) {
+    die("User not found.");
+}
+
+// Remove bookmark
+$stmt = $conn->prepare("DELETE FROM bookmarks WHERE recipe_id = ? AND user_id = ?");
+$stmt->bind_param("ii", $recipeId, $userId);
 $stmt->execute();
 $stmt->close();
 
-header("Location: recipe.php?id=" . $recipeId);
-exit;
-?>
-
+// Redirect back
+header("Location: " . $_SERVER['HTTP_REFERER']);
+exit();
