@@ -53,5 +53,3 @@ if ($stmt->execute($params)) {
     echo json_encode(["message" => "Failed to update profile."]);
 }
 ?>
-
-
