@@ -4,7 +4,7 @@
 require_once session_guard.php; // Ensure user is logged in
 require_once 'db.php';
 
-$user_id = $_SESSION['username'];
+$user_id = $_SESSION['user_id'];
 
 $sql = "SELECT username, created_at, country FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);

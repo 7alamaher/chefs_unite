@@ -66,10 +66,11 @@ $result = $stmt->get_result();
 <body>
 
 <h1>Your Recipes</h1>
+
     <nav class="navbar">
         <ul>
-            <li><a href="Followers.php">Followers Count</a></li>
-            <li><a href="Following.php">Following Count</a></li>
+            <li><a href="Followers.php">Followers </a></li>
+            <li><a href="Following.php">Following </a></li>
             <li><a href="UploadRecipe.php">Upload Recipe</a></li>
             <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
             <li><a href="SavedRecipes.php">Saved Recipes</a></li>

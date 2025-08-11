@@ -34,8 +34,8 @@ $user = $result->fetch_assoc();
         <ul>
             <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
             <li class="text1">Chefs Unite</li>
-            <li class="icon1"><a href="YourRecipes.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
-            <li class="icon2"><a href="HomeProfile.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
+            <li class="icon1"><a href="profile.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
+            <li class="icon2"><a href="Home.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
         </ul>
     </nav>
 

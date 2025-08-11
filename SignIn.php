@@ -6,9 +6,8 @@ $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+    $password = trim($_POST['password']);  // matches input name="password"
 
-    
     $stmt = $conn->prepare("SELECT user_id, username, email, password_hash FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -35,41 +34,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html class="login-html">
 <head>
-    <title>Sign In</title>
-    <style>
-        .error { color: red; }
-        .form-container {
-            max-width: 300px;
-            margin: auto;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-    </style>
-    <link rel="stylesheet" href="CU.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chefs Unite Website</title>
+	<link rel="stylesheet" href="CU.css">
 </head>
-<body>
+<body class="login-page">
+    <nav class="navbar">
+        <ul>
+            <li><a href="Home.html"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
+            <li class="text1">Chefs Unite</li>
+            <li class="sign"><a href="SignUp.php">Sign up or Log in!</a></li>
+        </ul>
+    </nav>
 
-<div class="form-container">
-    <h2>Sign In</h2>
+	<div class="login-container">
+	    <div class="loginimage">
+	        <form class="loginboxes" method="POST" action="">
+                <?php if (!empty($error)) : ?>
+                    <p style="color:red; margin-bottom: 15px;"><?php echo htmlspecialchars($error); ?></p>
+                <?php endif; ?>
+                
+		        <input type="email" placeholder="E-mail" name="email" required class="search" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>">
+		        <input type="password" placeholder="Password" name="password" required class="search">
+		        <button type="submit" class="sign">Login</button>
+	        </form>
+	    </div>
 
-    <?php if (!empty($error)) { echo "<p class='error'>$error</p>"; } ?>
-
-    <form method="POST" action="">
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
-
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-
-        <button type="submit">Sign In</button>
-    </form>
-</div>
-    
-<br>
-<h2>No account? Create one <a href="SignUp.php">here</a>!</h2>
-    
+	    <div class="signupoffer">
+		    <h1>New Here?</h1>
+		    <p>Join our kitchen! Create an account and share your favorite meals.</p>
+		    <button class="sign" onclick="window.location.href='SignUp.php'">Sign Up</button>
+	    </div>
+    </div>
 </body>
 </html>

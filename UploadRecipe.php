@@ -78,13 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
             $recipe_id = $stmt->insert_id;
 
             // Insert ingredients if provided
-            if (!empty($_POST['ingredient_name']) && is_array($_POST['ingredient_name'])) {
+            if (!empty($_POST['name']) && is_array($_POST['name'])) {
                 $ingredientStmt = $conn->prepare("
                     INSERT INTO recipe_ingredients (recipe_id, name, quantity, unit) 
                     VALUES (?, ?, ?, ?)
                 ");
 
-                foreach ($_POST['ingredient_name'] as $index => $name) {
+                foreach ($_POST['name'] as $index => $name) {
                     $name = trim($name);
                     $quantity = isset($_POST['ingredient_qty'][$index]) && $_POST['ingredient_qty'][$index] !== ''
                         ? floatval($_POST['ingredient_qty'][$index])
@@ -135,8 +135,8 @@ $conn->close();
         <ul>
             <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
             <li class="text1">Chefs Unite</li>
-            <li class="icon1"><a href="YourRecipes.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
-            <li class="icon2"><a href="HomeProfile.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
+            <li class="icon1"><a href="profile.php"><img src="Images/profile icon.png" alt="Profile"></a></li>
+            <li class="icon2"><a href="Home.php"><img src="Images/home icon.png" alt="Home Page"></a></li>
         </ul>
     </nav>
 
