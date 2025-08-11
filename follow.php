@@ -2,35 +2,41 @@
 session_start();
 require 'db.php';
 
-if (!isset($_SESSION['user']) || !isset($_POST['followed_id'])) {
-    header("Location: home.php");
-    exit;
+if (!isset($_SESSION['username'])) {
+    header("Location: SignIn.php");
+    exit();
 }
 
-$currentUsername = $_SESSION['user'];
-$followingId = intval($_POST['followed_id']); // user to be followed
+if (!isset($_GET['user_id'])) {
+    die("User ID missing.");
+}
 
-// Get current user's user_id
+$followed_id = intval($_GET['user_id']);
+
+// Get current user ID
 $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-$stmt->bind_param("s", $currentUsername);
+$stmt->bind_param("s", $_SESSION['username']);
 $stmt->execute();
-$stmt->bind_result($followerId);
+$stmt->bind_result($follower_id);
 $stmt->fetch();
 $stmt->close();
 
-if (!$followerId || $followerId == $followingId) {
-    // Prevent invalid or self-follow
-    header("Location: home.php");
-    exit;
+if ($follower_id === $following_id) {
+    die("You can't follow yourself.");
 }
 
-// Insert follow relationship if not already followed
-$stmt = $conn->prepare("INSERT IGNORE INTO follows (follower_id, following_id) VALUES (?, ?)");
-$stmt->bind_param("ii", $followerId, $followingId);
-$stmt->execute();
-$stmt->close();
+// Only follow if not already followed
+$check = $conn->prepare("SELECT id FROM follows WHERE follower_id = ? AND following_id = ?");
+$check->bind_param("ii", $follower_id, $followed_id);
+$check->execute();
+if ($check->get_result()->num_rows === 0) {
+    $add = $conn->prepare("INSERT INTO follows (follower_id, following_id) VALUES (?, ?)");
+    $add->bind_param("ii", $follower_id, $followed_id);
+    $add->execute();
+    $add->close();
+}
+$check->close();
 
-header("Location: home.php");
-exit;
+header("Location: viewProfile.php?id=" . $followed_id);
+exit();
 ?>
-
