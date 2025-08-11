@@ -22,6 +22,9 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Get logged-in username
+$currentUsername = $_SESSION['username'];
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +37,20 @@ $result = $stmt->get_result();
     <link href="https://api.fontshare.com/v2/css?f[]=chillax@400&display=swap" rel="stylesheet">
 </head>
 <body>
+    
+    <nav class="navbar">
+        <ul>
+            <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
+            <li class="text1">Chefs Unite</li>
+            <li class="sign">
+                <?php if (isset($_SESSION['username'])): ?>
+                    <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?> | <a href="SignIn.php">Logout</a> | <a href="UploadRecipe.php">Add Recipe</a> | <a href="profile.php">Profile</a></span>
+                <?php else: ?>
+                    <a href="SignIn.php">Sign up or Log in!</a>
+                <?php endif; ?>
+            </li>
+        </ul>
+    </nav>
     
     <h1>My Saved Recipes</h1>
     <nav class="navbar">
