@@ -24,6 +24,56 @@ $result = $stmt->get_result();
     <title>Your Recipes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* ====== Chefs Unite Navbar Styles ====== */
+        .navbar {
+            background: linear-gradient(to right, orange, gold);
+            padding: 10px;
+        }
+        .navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar li {
+            display: inline-block;
+        }
+        .navbar img {
+            height: 40px;
+        }
+        .text1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px black;
+        }
+
+        /* ====== Recipe Tabs Navbar Styles ====== */
+        .recipe-tabs {
+            margin-top: 15px;
+        }
+        .recipe-tabs ul {
+            list-style: none;
+            display: flex;
+            padding: 0;
+            margin: 0;
+            gap: 15px;
+        }
+        .recipe-tabs li a {
+            text-decoration: none;
+            padding: 8px 12px;
+            background: #eee;
+            border-radius: 5px;
+            color: black;
+        }
+        .yourRecipesTab a {
+            background: gold;
+            font-weight: bold;
+        }
+
+        /* ====== Recipe Card Styles ====== */
         .recipe-card {
             border: 1px solid #ccc;
             padding: 10px;
@@ -41,6 +91,8 @@ $result = $stmt->get_result();
             cursor: pointer;
             margin-left: 10px;
         }
+
+        /* ====== Confirm Box ====== */
         .confirm-box {
             display: none;
             position: fixed;
@@ -65,20 +117,33 @@ $result = $stmt->get_result();
 </head>
 <body>
 
+<!-- Chefs Unite Navbar -->
+<nav class="navbar"> 
+    <ul>
+        <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
+        <li class="text1">Chefs Unite</li>
+        <li class="right-icons">
+            <a href="profile.php"><img src="Images/profile icon.png" alt="Profile"></a>
+            <a href="Home.php"><img src="Images/home icon.png" alt="Home Page"></a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Recipe Tabs Navbar -->
+<nav class="recipe-tabs">
+    <ul>
+        <li><a href="Followers.php">Followers</a></li>
+        <li><a href="Following.php">Following</a></li>
+        <li><a href="UploadRecipe.php">Upload Recipe</a></li>
+        <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
+        <li><a href="SavedRecipes.php">Saved Recipes</a></li>
+    </ul>
+</nav>
+
 <h1>Your Recipes</h1>
 
-    <nav class="navbar">
-        <ul>
-            <li><a href="Followers.php">Followers </a></li>
-            <li><a href="Following.php">Following </a></li>
-            <li><a href="UploadRecipe.php">Upload Recipe</a></li>
-            <li class="yourRecipesTab"><a href="YourRecipes.php">Your Recipes</a></li>
-            <li><a href="SavedRecipes.php">Saved Recipes</a></li>
-        </ul>
-    </nav>
-
 <?php while ($row = $result->fetch_assoc()): ?>
-    <div class="recipe-card" <?php echo $row['id']; ?>>
+    <div class="recipe-card" id="recipe-<?php echo $row['id']; ?>">
         <div class="recipe-info">
             <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="Recipe Image" width="60" height="60">
             <span><?php echo htmlspecialchars($row['title']); ?></span>
@@ -131,7 +196,7 @@ function deleteRecipeConfirmed() {
         if (data.success) {
             const recipeCard = document.getElementById('recipe-' + recipeToDelete);
             if (recipeCard) {
-                recipeCard.remove(); // Remove recipe card instantly
+                recipeCard.remove();
             }
         } else {
             alert(data.message || "Error deleting recipe.");
