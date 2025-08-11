@@ -25,13 +25,13 @@ $currentUsername = $_SESSION['username'];
 <body>
     <nav class="navbar">
         <ul>
-            <li><a href="home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
+            <li><a href="Home.php"><img src="Images/Untitled_Artwork.jpg" alt="Logo"></a></li>
             <li class="text1">Chefs Unite</li>
             <li class="sign">
                 <?php if (isset($_SESSION['username'])): ?>
-                    <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?> | <a href="logout.php">Logout</a></span>
+                    <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?> | <a href="SignIn.php">Logout</a> | <a href="UploadRecipe.php">Add Recipe</a> | <a href="profile.php">Profile</a></span>
                 <?php else: ?>
-                    <a href="login.php">Sign up or Log in!</a>
+                    <a href="SignIn.php">Sign up or Log in!</a>
                 <?php endif; ?>
             </li>
         </ul>
@@ -90,7 +90,7 @@ $currentUsername = $_SESSION['username'];
     <?php
     $cuisine = 'Vietnamese';
 
-    if ($currentUsername) {
+     if ($currentUsername) {
         // Logged-in user: check like and bookmark status
         $stmt = $conn->prepare("
             SELECT r.id AS recipe_id, r.title, r.image_url, u.username,
@@ -110,59 +110,56 @@ $currentUsername = $_SESSION['username'];
             WHERE r.cuisine = ?
         ");
         $stmt->bind_param("sss", $currentUsername, $currentUsername, $cuisine);
-    } else {
-        // Guest user: only get like count
-        $stmt = $conn->prepare("
-            SELECT r.id AS recipe_id, r.title, r.image_url, u.username,
-                   (SELECT COUNT(*) FROM likes l WHERE l.recipe_id = r.id) AS like_count
-            FROM recipes r
-            JOIN users u ON r.user_id = u.user_id
-            WHERE r.cuisine = ?
-        ");
-        $stmt->bind_param("s", $cuisine);
     }
 
     $stmt->execute();
     $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()):
-        $recipeId = (int)$row['recipe_id'];
-        $title = htmlspecialchars($row['title']);
-        $username = htmlspecialchars($row['username']);
-        $image = htmlspecialchars($row['image_url'] ?? 'Images/Untitled_Artwork.jpg');
-        $likeCount = (int)$row['like_count'];
-        $userLiked = isset($row['user_liked']) ? (bool)$row['user_liked'] : false;
-        $userBookmarked = isset($row['user_bookmarked']) ? (bool)$row['user_bookmarked'] : false;
+while ($row = $result->fetch_assoc()):
+    $recipeId = (int)$row['recipe_id'];
+    $title = htmlspecialchars($row['title']);
+    $username = htmlspecialchars($row['username']);
+    $image = htmlspecialchars($row['image_url'] ?? 'Images/Untitled_Artwork.jpg');
+    $likeCount = (int)$row['like_count'];
+    $userLiked = isset($row['user_liked']) ? (bool)$row['user_liked'] : false;
+    $userBookmarked = isset($row['user_bookmarked']) ? (bool)$row['user_bookmarked'] : false;
 
-        $likeAction = $userLiked ? 'unlike' : 'like';
-        $likeBtnText = $userLiked ? 'Unlike' : 'Like';
-
-        $bookmarkAction = $userBookmarked ? 'unbookmark.php' : 'bookmark.php';
-        $bookmarkBtnText = $userBookmarked ? 'Remove Bookmark' : 'Bookmark';
-    ?>
+    $likeAction = $userLiked ? 'unlike' : 'like';
+    $likeBtnText = $userLiked ? 'Unlike' : 'Like';
+?>
+    <div class="recipe-item">
         <figure>
-            <img src="<?= $image ?>" alt="<?= $title ?>">
-            <figcaption><a href="#"><?= $title ?> by <?= $username ?></a></figcaption>
+            <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($title) ?>">
+            <figcaption>
+                <a href="viewRecipe.php?id=<?= urlencode($recipeId) ?>">
+                    <?= htmlspecialchars($title) ?> by <?= htmlspecialchars($username) ?>
+                </a>
+            </figcaption>
+        </figure>
 
-            <?php if ($currentUsername): ?>
-                <form action="like_toggle.php" method="POST" style="margin-top: 8px;">
-                    <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
-                    <input type="hidden" name="action" value="<?= $likeAction ?>">
-                    <button type="submit"><?= $likeBtnText ?> (<?= $likeCount ?>)</button>
-                </form>
+        <?php if ($currentUsername): ?>
+            <form action="like_toggle.php" method="POST" style="margin-top: 8px;">
+                <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
+                <input type="hidden" name="action" value="<?= $likeAction ?>">
+                <button type="submit"><?= $likeBtnText ?> (<?= $likeCount ?>)</button>
+            </form>
 
-                <form action="<?= $bookmarkAction ?>" method="POST" style="margin-top: 4px;">
+            <?php if ($userBookmarked): ?>
+                <form action="unbookmark.php" method="POST" style="margin-top: 4px;">
                     <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
-                    <button type="submit"><?= $bookmarkBtnText ?></button>
+                    <button type="submit">Remove Bookmark</button>
                 </form>
             <?php else: ?>
-                <p style="margin-top: 8px;">Likes: <?= $likeCount ?> | <a href="login.php">Login to like</a></p>
-                <p><a href="login.php">Login to bookmark</a></p>
+                <form action="bookmark.php" method="POST" style="margin-top: 4px;">
+                    <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
+                    <button type="submit">Bookmark</button>
+                </form>
             <?php endif; ?>
-        </figure>
-    <?php endwhile;
-    $stmt->close();
-    ?>
+        <?php endif; ?>
+    </div>
+<?php endwhile;
+$stmt->close();
+?>
 </div>
 
 </body>
