@@ -56,13 +56,9 @@ $user = $result->fetch_assoc();
         </nav>
     </div>
 
-    <!-- Add Recipe Button -->
-    <div class="buttons">
-        <button class="addRecipeBtn" onclick="window.location.href='AddRecipe.php'">+</button>
-    </div>
-
     <div class="gallery2">
         <!-- Empty here, recipes are on YourRecipes.php -->
     </div>
+    
 </body>
 </html>
