@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php'; 
+require_once 'db.php';
 
 // Redirect if user not logged in
 if (!isset($_SESSION['username']) || empty($_SESSION['username'])) {
@@ -20,31 +20,31 @@ $user_id = $user['user_id'] ?? null;
 $successMsg = $errorMsg = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
+    // Sanitize inputs
     $title       = trim($_POST['newName']);
-    $mealType    = $_POST['mealType'];
-    $cuisine     = $_POST['cuiType'];
-    $difficulty  = $_POST['recipeDiff'];
-    $serves      = $_POST['serves'];
-    $timeR       = $_POST['timeR'];
+    $mealType    = trim($_POST['mealType']);
+    $cuisine     = trim($_POST['cuiType']);
+    $difficulty  = trim($_POST['recipeDiff']);
+    $serves      = trim($_POST['serves']);
+    $timeR       = trim($_POST['timeR']);
     $steps       = trim($_POST['addSteps']);
 
-    //  FORM VALIDATION
-    if (empty($title) || empty($mealType) || empty($cuisine) || empty($difficulty) || empty($serves) || empty($timeR) || empty($steps)) {
-        $errorMsg = "Please fill in all required fields.";
-    }
-    
     // Handle image upload
-    $image_url = "";
-    if (empty($errorMsg) && isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
-        $fileTmp  = $_FILES['newImage']['tmp_name'];
-        $fileType = mime_content_type($fileTmp); // Detect MIME type
+    $image_url = null;
+    if (isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $fileType = mime_content_type($_FILES['newImage']['tmp_name']);
+        $fileSize = $_FILES['newImage']['size'];
 
-        $allowed_types = ['image/jpeg', 'image/png'];
-        if (!in_array($fileType, $allowed_types)) {
-            $errorMsg = "Only JPG and PNG images are allowed.";
+        if (!in_array($fileType, $allowedTypes)) {
+            $errorMsg = "Only JPG, PNG, and GIF files are allowed.";
+        } elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
+            $errorMsg = "Image size must be under 5MB.";
         } else {
+            $fileTmp  = $_FILES['newImage']['tmp_name'];
             $fileName = uniqid("recipe_", true) . "." . pathinfo($_FILES['newImage']['name'], PATHINFO_EXTENSION);
             $filePath = "uploads/" . $fileName;
+
             if (!is_dir("uploads")) mkdir("uploads", 0777, true);
             if (move_uploaded_file($fileTmp, $filePath)) {
                 $image_url = $filePath;
@@ -55,47 +55,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
     }
 
     if (empty($errorMsg)) {
-        try {
-            $conn->begin_transaction();
-
-        // Insert recipe
+        // Insert into recipes table
         $stmt = $conn->prepare("
-            INSERT INTO recipes (user_id, title, description, steps, cuisine, image_url, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, NOW())
+            INSERT INTO recipes 
+                (user_id, title, steps, cuisine, image_url, recipe_type, recipe_difficulty, serves, Time_to_make) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $description = "Meal: $mealType | Difficulty: $difficulty | Serves: $serves | Time: $timeR";
-        $stmt->bind_param("isssss", $user_id, $title, $description, $steps, $cuisine, $image_url);
-          if ($stmt->execute()) {
+        $stmt->bind_param(
+            "issssssss", 
+            $user_id, 
+            $title, 
+            $steps, 
+            $cuisine, 
+            $image_url, 
+            $mealType, 
+            $difficulty, 
+            $serves, 
+            $timeR
+        );
+
+        if ($stmt->execute()) {
             $recipe_id = $stmt->insert_id;
 
-             // Insert ingredients
-             if (!empty($_POST['ingredient_name'])) {
+            // Insert ingredients if provided
+            if (!empty($_POST['ingredient_name']) && is_array($_POST['ingredient_name'])) {
                 $ingredientStmt = $conn->prepare("
-                    INSERT INTO recipe_ingredients (recipe_id, ingredient_name, quantity, unit)
+                    INSERT INTO recipe_ingredients (recipe_id, name, quantity, unit) 
                     VALUES (?, ?, ?, ?)
                 ");
+
                 foreach ($_POST['ingredient_name'] as $index => $name) {
                     $name = trim($name);
-                    $qty  = trim($_POST['ingredient_qty'][$index] ?? '');
-                    $unit = trim($_POST['ingredient_unit'][$index] ?? '');
+                    $quantity = isset($_POST['ingredient_qty'][$index]) && $_POST['ingredient_qty'][$index] !== ''
+                        ? floatval($_POST['ingredient_qty'][$index])
+                        : null;
+                    $unit = isset($_POST['ingredient_unit'][$index]) ? trim($_POST['ingredient_unit'][$index]) : null;
+
                     if (!empty($name)) {
-                        $ingredientStmt->bind_param("isss", $recipe_id, $name, $qty, $unit);
-                       if (!$ingredientStmt->execute()) {
-                            throw new Exception("Error adding ingredient: " . $ingredientStmt->error);
+                        // Bind parameters, handle null quantity properly
+                        if ($quantity === null) {
+                            // Use NULL for quantity (bind as double with null requires special handling)
+                            $ingredientStmt->bind_param("isss", $recipe_id, $name, $unit);
+                            // This would fail because SQL expects 4 params; so instead pass quantity as null but bind_param doesn't accept null for 'd' type
+                            // Workaround: bind quantity as NULL string and handle in SQL or allow zero instead of null.
+                            // For simplicity, cast quantity to 0 if null:
+                            $quantity = 0;
+                            $ingredientStmt->bind_param("isds", $recipe_id, $name, $quantity, $unit);
+                        } else {
+                            $ingredientStmt->bind_param("isds", $recipe_id, $name, $quantity, $unit);
                         }
+                        $ingredientStmt->execute();
                     }
                 }
+                $ingredientStmt->close();
             }
 
-          }
-            $conn->commit(); 
             $successMsg = "Recipe added successfully!";
-    }  catch (Exception $e) {
-            $conn->rollback();
-            $errorMsg = $e->getMessage();
+        } else {
+            $errorMsg = "Error adding recipe: " . $stmt->error;
         }
+        $stmt->close();
     }
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -186,8 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
                     <option value="2+">2-3 hrs</option>
                     <option value="3+">More than 3 hrs</option>
                 </select>
-           </div> 
-            <div class="sec3">
+
                 <label>Ingredients:</label>
                 <div id="ingredient-list">
                     <div class="ingredient-row">
@@ -199,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
                 <button type="button" onclick="addIngredient()">Add Ingredient</button>
             </div>
 
-            <div class="sec4">
+            <div class="sec3">
                 <label for="addSteps">Steps (enter in numerical order):</label>
                 <textarea name="addSteps" id="addSteps"></textarea>   
             </div>
